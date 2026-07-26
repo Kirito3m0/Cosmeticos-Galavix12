@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galavix — Distribuidora de Cosméticos al Mayoreo | Cd. Juárez</title>
+<meta name="description" content="Galavix Distribuidora — cosméticos al mayoreo en Ciudad Juárez. 4 sucursales, precios especiales para revendedoras y emprendedoras.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Playfair+Display:ital@1&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="nav" id="top">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#top">
+      <span class="nav-logo-mark">GC</span>
+      <span class="nav-logo-text">Galavix</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#nosotros" data-i18n="nav_nosotros">Nosotros</a>
+      <a href="#precios" data-i18n="nav_precios">Precios</a>
+      <a href="#sucursales" data-i18n="nav_sucursales">Sucursales</a>
+      <a href="#marcas" data-i18n="nav_marcas">Marcas</a>
+      <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
+    </nav>
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="es">ES</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <a class="nav-cta" href="https://wa.me/526562658851" target="_blank" rel="noopener" data-i18n="nav_whatsapp">WhatsApp</a>
+    <button class="nav-burger" id="navBurger" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <nav class="nav-mobile" id="navMobile">
+    <a href="#nosotros" data-i18n="nav_nosotros">Nosotros</a>
+    <a href="#precios" data-i18n="nav_precios">Precios</a>
+    <a href="#sucursales" data-i18n="nav_sucursales">Sucursales</a>
+    <a href="#marcas" data-i18n="nav_marcas">Marcas</a>
+    <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
+    <div class="lang-switch lang-switch--mobile">
+      <button class="lang-btn" data-lang="es">ES</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <a class="nav-mobile-cta" href="https://wa.me/526562658851" target="_blank" rel="noopener">WhatsApp</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-glow hero-glow--1"></div>
+  <div class="hero-glow hero-glow--2"></div>
+  <svg class="hero-branch hero-branch--left" viewBox="0 0 220 420" aria-hidden="true">
+    <path d="M10 10 C 60 90, 40 160, 90 220 C 120 260, 100 320, 130 400" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <path d="M40 60 C 20 55, 5 40, 0 20" fill="none" stroke="currentColor" stroke-width="1"/>
+    <path d="M70 140 C 45 135, 25 150, 15 175" fill="none" stroke="currentColor" stroke-width="1"/>
+    <path d="M100 240 C 130 230, 150 245, 165 270" fill="none" stroke="currentColor" stroke-width="1"/>
+    <path d="M115 320 C 90 320, 70 340, 65 365" fill="none" stroke="currentColor" stroke-width="1"/>
+  </svg>
+  <svg class="hero-branch hero-branch--right" viewBox="0 0 220 420" aria-hidden="true">
+    <path d="M210 10 C 160 90, 180 160, 130 220 C 100 260, 120 320, 90 400" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <path d="M180 60 C 200 55, 215 40, 220 20" fill="none" stroke="currentColor" stroke-width="1"/>
+    <path d="M150 140 C 175 135, 195 150, 205 175" fill="none" stroke="currentColor" stroke-width="1"/>
+    <path d="M120 240 C 90 230, 70 245, 55 270" fill="none" stroke="currentColor" stroke-width="1"/>
+    <path d="M105 320 C 130 320, 150 340, 155 365" fill="none" stroke="currentColor" stroke-width="1"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-monogram" aria-hidden="true">
+      <svg viewBox="0 0 140 140" width="86" height="86">
+        <circle cx="70" cy="70" r="66" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="70" y="66" text-anchor="middle" class="hero-monogram-gc">GC</text>
+        <text x="70" y="108" text-anchor="middle" class="hero-monogram-word">GALAVIX</text>
+      </svg>
+    </div>
+    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Distribuidora de cosméticos al mayoreo</p>
+    <h1 class="hero-title"><span data-i18n="hero_title_1">Donde empieza</span><br><em data-i18n="hero_title_2">tu utilidad</em></h1>
+    <p class="hero-sub" data-i18n="hero_sub">Precio de mayoreo desde una pieza.</p>
+    <div class="hero-actions">
+      <a href="#sucursales" class="btn btn-primary" data-i18n="hero_btn_sucursales">Ver sucursales</a>
+      <a href="#marcas" class="btn btn-ghost" data-i18n="hero_btn_marcas">Ver marcas</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="nosotros">
+  <div class="section-inner section-inner--narrow">
+    <p class="eyebrow" data-i18n="nosotros_eyebrow">Que somos</p>
+    <h2 class="section-title"><span data-i18n="nosotros_title_1">Hecho para </span> <em data-i18n="nosotros_title_2">Emprendedores</em><span data-i18n="nosotros_title_3"></span></h2>
+  </div>
+  <div class="section-inner">
+    <div class="about-grid">
+      <article class="about-card">
+        <h3 data-i18n="nosotros_q1_title">¿Quiénes somos?</h3>
+        <p data-i18n="nosotros_q1_text">—</p>
+      </article>
+      <article class="about-card">
+        <h3 data-i18n="nosotros_q2_title">¿Qué hacemos?</h3>
+        <p data-i18n="nosotros_q2_text">—</p>
+      </article>
+      <article class="about-card">
+        <h3 data-i18n="nosotros_q3_title">¿Por qué elegirnos?</h3>
+        <p data-i18n="nosotros_q3_text">—</p>
+      </article>
+    </div>
+    <p class="about-tagline"><span data-i18n="nosotros_tagline_1">Cosméticos Galavix</span><em data-i18n="nosotros_tagline_2">Donde empieza tu utilidad.</em></p>
+  </div>
+</section>
+
+<section class="section section--tint" id="precios">
+  <div class="section-inner">
+    <p class="eyebrow" data-i18n="precios_eyebrow">Cómo funcionan nuestros precios</p>
+    <h2 class="section-title"><span data-i18n="precios_title_1">Dos niveles, pensados para tu</span> <em data-i18n="precios_title_2">crecimiento</em></h2>
+
+    <div class="price-grid">
+      <article class="price-card">
+        <div class="price-card-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="34" height="34"><path d="M14 16 L14 12 A10 10 0 0 1 34 12 L34 16" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="16" width="32" height="26" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M18 24 L18 28 M30 24 L30 28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3 data-i18n="precio_mayoreo_title">Precio Mayoreo</h3>
+        <p class="price-tag" data-i18n="precio_mayoreo_tag">Desde 1 pieza</p>
+        <p data-i18n="precio_mayoreo_desc">—</p>
+      </article>
+
+      <article class="price-card price-card--highlight">
+        <span class="price-badge" data-i18n="precio_super_badge">Mejor margen</span>
+        <div class="price-card-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="34" height="34"><path d="M24 6 L34 20 L24 42 L14 20 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 20 L34 20" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <h3 data-i18n="precio_super_title">Precio Súper Mayoreo</h3>
+        <p class="price-tag"><span data-i18n="precio_super_tag_1">3 piezas del mismo artículo</span> <span data-i18n="precio_super_tag_or">o</span> <span data-i18n="precio_super_tag_2">compra mínima de $1,500</span></p>
+        <p data-i18n="precio_super_desc">—</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sucursales">
+  <div class="section-inner">
+    <p class="eyebrow" data-i18n="sucursales_eyebrow">Nuestras ubicaciones</p>
+    <h2 class="section-title"><span data-i18n="sucursales_title_1">Cuatro sucursales,</span> <em data-i18n="sucursales_title_2">una sola distribuidora</em></h2>
+    <div class="loc-map-wrap">
+      <div id="locMap"></div>
+    </div>
+    <div class="loc-grid" id="locGrid">
+      <p class="loading-hint">Cargando sucursales…</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tint" id="marcas">
+  <div class="section-inner">
+    <p class="eyebrow" data-i18n="marcas_eyebrow">Existencias por marca</p>
+    <h2 class="section-title"><span data-i18n="marcas_title_1">Consulta lo que</span> <em data-i18n="marcas_title_2">tenemos ahora</em></h2>
+    <p class="lead lead--center" data-i18n="marcas_lead">—</p>
+    <div class="brand-grid" id="brandGrid">
+      <p class="loading-hint">Cargando marcas…</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contacto">
+  <div class="section-inner section-inner--narrow contact-block">
+    <p class="eyebrow" data-i18n="contacto_eyebrow">Contacto y redes</p>
+    <h2 class="section-title"><span data-i18n="contacto_title_1">Hablemos por</span> <em data-i18n="contacto_title_2">nuestras redes sociales</em></h2>
+    <p class="lead" data-i18n="contacto_lead">—</p>
+
+    <div class="contact-grid">
+      <a class="contact-item" href="https://wa.me/526562658851" target="_blank" rel="noopener">
+        <span class="contact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        </span>
+        <span><strong>WhatsApp</strong>+52 656 265 8851</span>
+      </a>
+      <a class="contact-item" href="mailto:contactogalavix@gmail.com">
+        <span class="contact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 6.5 12 13 21 6.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        </span>
+        <span><strong>Correo</strong>contactogalavix@gmail.com</span>
+      </a>
+      <a class="contact-item" href="https://www.facebook.com/Cosmeticosgalavix/" target="_blank" rel="noopener">
+        <span class="contact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M14 9h3V5.5h-3c-2.2 0-4 1.8-4 4V12H8v3.5h2V22h3.5v-6.5H16l.6-3.5h-3.1V9.6c0-.4.3-.6.5-.6z" fill="currentColor"/></svg>
+        </span>
+        <span><strong>Facebook</strong>Cosmeticos Galavix – Mayoreo CdJrz</span>
+      </a>
+      <a class="contact-item" href="https://www.instagram.com/cosmeticosgalavix_/" target="_blank" rel="noopener">
+        <span class="contact-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        </span>
+        <span><strong>Instagram</strong>@cosmeticosgalavix_</span>
+      </a>
+    </div>
+
+    <div class="whatsapp-groups">
+      <p class="whatsapp-groups-title" data-i18n="whatsapp_groups_title">Únete a nuestros grupos de WhatsApp</p>
+      <div class="whatsapp-groups-grid">
+        <a class="wa-group" href="https://chat.whatsapp.com/DdMPRnKABtbEWAHCrWpvox?mode=gi_t" target="_blank" rel="noopener">
+          <span class="wa-group-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          </span>
+          <span data-i18n="whatsapp_group_1">Grupo 1</span>
+        </a>
+        <a class="wa-group" href="https://chat.whatsapp.com/BendVaP6EH9JAJxN8SwMhN?mode=gi_t" target="_blank" rel="noopener">
+          <span class="wa-group-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          </span>
+          <span data-i18n="whatsapp_group_2">Grupo 2</span>
+        </a>
+        <a class="wa-group" href="https://chat.whatsapp.com/E4x5OjciZgzIFcOdWjdrOX?mode=gi_t" target="_blank" rel="noopener">
+          <span class="wa-group-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          </span>
+          <span data-i18n="whatsapp_group_3">Grupo 3</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="footer-logo">GC Galavix</span>
+    <p data-i18n="footer_text">Donde empieza tu utilidad.</p>
+  </div>
+</footer>
+
+<a href="#top" class="to-top" id="toTop" aria-label="Volver arriba">↑</a>
+
+<div class="gallery-modal" id="galleryModal">
+  <div class="gallery-modal-inner">
+    <div class="gallery-modal-head">
+      <h3 id="galleryTitle">Marca</h3>
+      <div class="gallery-modal-actions">
+        <a id="galleryFbLink" class="gallery-fb-link" href="#" target="_blank" rel="noopener">Ver en Facebook</a>
+        <button id="galleryClose" class="gallery-close" aria-label="Cerrar">✕</button>
+      </div>
+    </div>
+    <div class="gallery-track" id="galleryTrack"></div>
+  </div>
+</div>
+
+<!-- NUEVO: modal de zoom para agrandar la foto al picarle -->
+<div class="zoom-modal" id="zoomModal">
+  <button id="zoomPrev" class="zoom-nav zoom-nav--prev" aria-label="Foto anterior">‹</button>
+  <img id="zoomImg" src="" alt="">
+  <button id="zoomNext" class="zoom-nav zoom-nav--next" aria-label="Foto siguiente">›</button>
+  <button id="zoomClose" class="zoom-close" aria-label="Cerrar">✕</button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="i18n.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

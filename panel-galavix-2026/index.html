@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel — Galavix</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <form class="login-card" id="loginForm">
+    <h1>Panel Galavix</h1>
+    <p class="login-sub">Acceso restringido al administrador</p>
+    <label>Correo</label>
+    <input type="email" id="loginEmail" required autocomplete="username">
+    <label>Contraseña</label>
+    <input type="password" id="loginPassword" required autocomplete="current-password">
+    <button type="submit">Entrar</button>
+    <p class="login-error" id="loginError"></p>
+  </form>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard" style="display:none">
+  <header class="dash-header">
+    <h1>Panel Galavix</h1>
+    <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+  </header>
+
+  <nav class="dash-tabs">
+    <button class="dash-tab dash-tab--active" data-tab="sucursales">Sucursales</button>
+    <button class="dash-tab" data-tab="marcas">Marcas</button>
+  </nav>
+
+  <section class="dash-panel dash-panel--active" id="panel-sucursales">
+    <p class="dash-hint">Edita dirección, horarios y el enlace de mapa de cada sucursal. Los cambios se guardan al instante y se ven en la página pública en cuanto recargue.</p>
+    <div id="locList" class="dash-list"></div>
+  </section>
+
+  <section class="dash-panel" id="panel-marcas">
+    <p class="dash-hint">Edita el nombre y el enlace del álbum de Facebook de cada marca.</p>
+    <div id="brandList" class="dash-list"></div>
+  </section>
+
+  <p class="dash-toast" id="toast"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config.js"></script>
+<script src="panel.js"></script>
+</body>
+</html>
