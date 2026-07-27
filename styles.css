@@ -509,7 +509,7 @@ p { line-height: 1.7; color: var(--ink-soft); }
 
 /* ---------------- FOOTER ---------------- */
 .footer { background: var(--ink); color: #EEE1D6; padding: 50px 24px; text-align: center; }
-.footer-logo-img { height: 150px; width: auto; margin: 0 auto 14px; display: block; }
+.footer-logo-img { height: 120px; width: auto; margin: 0 auto 14px; display: block; }
 .footer p { color: #CBB6A6; font-size: 14px; max-width: 420px; margin: 0 auto; }
 
 .to-top {
