@@ -292,3 +292,152 @@ document.addEventListener("DOMContentLoaded", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 });
+
+// ============================================================
+// Animaciones (fusionadas aquí, ya no hay archivo aparte)
+// 1) Partículas doradas flotando sobre la foto del hero
+// 2) Parallax sutil del fondo al hacer scroll
+// 3) Aparición ("reveal") de tarjetas y títulos al entrar en pantalla
+//    con respaldo: si algo falla, el texto SIEMPRE se muestra.
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---- Respaldo de seguridad: si por lo que sea el reveal no corre,
+  // el texto se muestra solo, nunca se queda invisible. ----
+  function forceRevealAll() {
+    document.querySelectorAll(".reveal").forEach(el => el.classList.add("in-view"));
+  }
+  const safetyTimer = setTimeout(forceRevealAll, 2500);
+
+  // ---- 1) Partículas doradas en el hero ----
+  function initHeroParticles() {
+    const canvas = document.getElementById("heroParticles");
+    const hero = document.querySelector(".hero");
+    if (!canvas || !hero || reduceMotion) return;
+
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let width, height, dpr;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = hero.offsetWidth;
+      height = hero.offsetHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function makeParticle() {
+      return {
+        x: Math.random() * width,
+        y: height + Math.random() * 60,
+        r: 1 + Math.random() * 2.4,
+        speed: 0.25 + Math.random() * 0.55,
+        drift: (Math.random() - 0.5) * 0.4,
+        alpha: 0.15 + Math.random() * 0.45,
+        twinkle: Math.random() * Math.PI * 2,
+      };
+    }
+
+    resize();
+    let count = width < 700 ? 26 : 46;
+    for (let i = 0; i < count; i++) particles.push(makeParticle());
+
+    const goldTones = ["232,162,107", "217,168,108", "245,199,154", "255,255,255"];
+
+    function tick() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.y -= p.speed;
+        p.x += p.drift;
+        p.twinkle += 0.02;
+        if (p.y < -10) {
+          particles[i] = makeParticle();
+          particles[i].y = height + 10;
+          continue;
+        }
+        const flicker = (Math.sin(p.twinkle) + 1) / 2;
+        const tone = goldTones[i % goldTones.length];
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(" + tone + "," + (p.alpha * (0.5 + flicker * 0.5)).toFixed(3) + ")";
+        ctx.shadowColor = "rgba(" + tone + ",0.8)";
+        ctx.shadowBlur = 6;
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resize();
+        particles = [];
+        const c = width < 700 ? 26 : 46;
+        for (let i = 0; i < c; i++) particles.push(makeParticle());
+      }, 200);
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  // ---- 2) Parallax de la imagen del hero ----
+  function initHeroParallax() {
+    const hero = document.querySelector(".hero");
+    if (!hero || reduceMotion) return;
+    if (window.matchMedia("(max-width: 900px)").matches) return;
+
+    let ticking = false;
+    window.addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const offset = window.scrollY;
+        const shift = Math.min(offset * 0.15, 90);
+        hero.style.backgroundPosition = "center, center " + (32 + shift * 0.12) + "%";
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  // ---- 3) Scroll reveal ----
+  function initScrollReveal() {
+    const items = document.querySelectorAll(".reveal");
+    if (!items.length) return;
+
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      forceRevealAll();
+      clearTimeout(safetyTimer);
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+
+    items.forEach((el) => observer.observe(el));
+    clearTimeout(safetyTimer);
+    // por si algún elemento nunca cruza el observer (ya está fuera de rango, etc.)
+    setTimeout(forceRevealAll, 2500);
+  }
+
+  try {
+    initHeroParticles();
+    initHeroParallax();
+    initScrollReveal();
+  } catch (e) {
+    console.warn("Animaciones: algo falló, mostrando todo el texto de todos modos.", e);
+    forceRevealAll();
+  }
+});
