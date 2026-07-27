@@ -291,6 +291,20 @@ p { line-height: 1.7; color: var(--ink-soft); }
 }
 .wa-group:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37,211,102,0.35); }
 
+/* ---------------- CANALES (WhatsApp Channel + Messenger) ---------------- */
+.channels-block { margin-top: 40px; text-align: center; }
+.channels-title { font-weight: 600; font-size: 15px; margin-bottom: 16px; color: var(--ink); }
+.channels-grid { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.channel-item {
+  display: inline-flex; align-items: center; gap: 8px; color: #fff;
+  padding: 11px 22px; border-radius: 100px; font-weight: 600; font-size: 14px;
+  transition: transform .2s, box-shadow .2s;
+}
+.channel-item--whatsapp { background: #25D366; }
+.channel-item--whatsapp:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37,211,102,0.35); }
+.channel-item--messenger { background: linear-gradient(135deg, #00B2FF 0%, #006AFF 50%, #B620E0 100%); }
+.channel-item--messenger:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,106,255,0.35); }
+
 /* ---------------- BRANDS ---------------- */
 /* ---------------- NOVEDADES / RECIÉN LLEGADO ---------------- */
 .novedades-scroll {
@@ -545,6 +559,9 @@ p { line-height: 1.7; color: var(--ink-soft); }
 
   .whatsapp-groups-grid { flex-direction: column; align-items: stretch; }
   .wa-group { justify-content: center; }
+
+  .channels-grid { flex-direction: column; align-items: stretch; }
+  .channel-item { justify-content: center; }
 
   .contact-block .section-title { font-size: clamp(24px, 7vw, 30px); }
 

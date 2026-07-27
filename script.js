@@ -16,10 +16,10 @@ function brandAllImages(brand) {
 
 // Datos por defecto: el sitio arranca con esto y los reemplaza si Supabase responde
 const DEFAULT_LOCATIONS = [
-  { name: "Centro", address: "Amado Nervo #311-1, Col. Centro. Muy cerca de Milano.", hours_weekday: "10:00 am – 5:30 pm", hours_sunday: "10:00 am – 4:00 pm", closed_day: "Miércoles cerrado", maps_url: "https://maps.app.goo.gl/A9ncqzs5Heiyu2kn6", accent_color: "#C6435B", lat: 31.7373677, lng: -106.4848073 },
-  { name: "Las Torres", address: "Av. de las Torres #1931. Lote Bravo. Plaza Arce, Local E11.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://www.google.com/maps/search/?api=1&query=31.6277,-106.3941", accent_color: "#C97B4A", lat: 31.6277, lng: -106.3941 },
-  { name: "Parajes del Sur", address: "Paseos del Sur #675-9, Fracc. Parajes del Sur. Por donde está Cobre 29.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://maps.app.goo.gl/XU9Qj6No9bBJE7ne8", accent_color: "#7B5EA7", lat: 31.5929, lng: -106.3782 },
-  { name: "Oriente", address: "Avenida Santiago Troncoso #2315, cerca de Smart Parajes de Oriente.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://maps.app.goo.gl/iHksqnCwqDPaYSU97", accent_color: "#C0577B", lat: 31.6087, lng: -106.3537 },
+  { name: "Centro", address: "Amado Nervo #311-1, Col. Centro. Muy cerca de Milano.", hours_weekday: "10:00 am – 5:30 pm", hours_sunday: "10:00 am – 4:00 pm", closed_day: "Miércoles cerrado", maps_url: "https://www.google.com/maps/search/?api=1&query=31.7373677,-106.4848073", accent_color: "#C6435B", lat: 31.7373677, lng: -106.4848073 },
+  { name: "Las Torres", address: "Av. de las Torres #1931. Lote Bravo. Plaza Arce, Local E11.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://www.google.com/maps/search/?api=1&query=31.6277153,-106.394144", accent_color: "#C97B4A", lat: 31.6277153, lng: -106.394144 },
+  { name: "Parajes del Sur", address: "Paseos del Sur #675-9, Fracc. Parajes del Sur. Por donde está Cobre 29.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://www.google.com/maps/search/?api=1&query=31.5927866,-106.3781243", accent_color: "#7B5EA7", lat: 31.5927866, lng: -106.3781243 },
+  { name: "Oriente", address: "Avenida Santiago Troncoso #2315, cerca de Smart Parajes de Oriente.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://www.google.com/maps/search/?api=1&query=31.6087158,-106.3536422", accent_color: "#C0577B", lat: 31.6087158, lng: -106.3536422 },
 ];
 
 const DEFAULT_BRANDS = [
