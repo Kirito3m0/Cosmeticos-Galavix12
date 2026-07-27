@@ -1,7 +1,3 @@
-// ============================================================
-// Conteo de imágenes locales por marca (ya organizadas en
-// assets/marcas/<slug>/<slug>-01.jpg, -02.jpg, etc.)
-// ============================================================
 const BRAND_IMAGE_COUNTS = {
   "italia-de-luxe": 39,
   "beauty-creations": 36,
@@ -25,12 +21,7 @@ function brandImages(slug) {
   return imgs;
 }
 
-// ============================================================
-// Datos por defecto — el sitio SIEMPRE arranca con esto, para
-// que sucursales y marcas se vean de inmediato aunque Supabase
-// tarde, falle, o el sitio se abra sin conexión (file://).
-// Si Supabase responde bien, estos datos se reemplazan al vuelo.
-// ============================================================
+
 const DEFAULT_LOCATIONS = [
   { name: "Centro", address: "Amado Nervo #311-1, Col. Centro. Muy cerca de Milano.", hours_weekday: "10:00 am – 5:30 pm", hours_sunday: "10:00 am – 4:00 pm", closed_day: "Miércoles cerrado", maps_url: "https://maps.app.goo.gl/A9ncqzs5Heiyu2kn6", accent_color: "#C6435B", lat: 31.7373677, lng: -106.4848073 },
   { name: "Las Torres", address: "Av. de las Torres #1931. Lote Bravo. Plaza Arce, Local E11.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://www.google.com/maps/search/?api=1&query=31.6277,-106.3941", accent_color: "#C97B4A", lat: 31.6277, lng: -106.3941 },
@@ -54,8 +45,7 @@ let LOCATIONS_CACHE = DEFAULT_LOCATIONS;
 let BRANDS_CACHE = DEFAULT_BRANDS;
 
 async function loadData() {
-  // Ya se renderizó con los valores por defecto al cargar la página.
-  // Aquí solo intentamos mejorar con datos frescos de Supabase.
+
   try {
     const { data: locations, error: locErr } = await supabaseClient
       .from("locations")
@@ -128,9 +118,7 @@ function renderBrands() {
   });
 }
 
-// ============================================================
-// Mapa real con las 4 sucursales (Leaflet + OpenStreetMap)
-// ============================================================
+
 let LEAFLET_MAP = null;
 function initMap() {
   const container = document.getElementById("locMap");
@@ -167,9 +155,6 @@ function initMap() {
   LEAFLET_MAP.fitBounds(group.getBounds().pad(0.25));
 }
 
-// ============================================================
-// Galería / lightbox
-// ============================================================
 function openGallery(slug) {
   const brand = BRANDS_CACHE.find(b => b.slug === slug);
   const imgs = brandImages(slug);
@@ -203,9 +188,6 @@ function closeGallery() {
   document.body.style.overflow = "";
 }
 
-// ============================================================
-// Zoom de imagen (agrandar foto dentro de la galería)
-// ============================================================
 let ZOOM_IMAGES = [];
 let ZOOM_INDEX = 0;
 let ZOOM_ALT = "";
@@ -244,12 +226,10 @@ function closeZoom() {
   ZOOM_IMAGES = [];
 }
 
-// ============================================================
-// Nav móvil, scroll-to-top, inicialización
-// ============================================================
+
 document.addEventListener("DOMContentLoaded", () => {
   initLanguage();
-  window.renderDynamicSections(); // se ve de inmediato con los datos por defecto
+  window.renderDynamicSections();
   initMap();
   loadData(); // intenta mejorar con datos frescos de Supabase, sin bloquear nada
 
@@ -293,18 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ============================================================
-// Animaciones (fusionadas aquí, ya no hay archivo aparte)
-// 1) Partículas doradas flotando sobre la foto del hero
-// 2) Parallax sutil del fondo al hacer scroll
-// 3) Aparición ("reveal") de tarjetas y títulos al entrar en pantalla
-//    con respaldo: si algo falla, el texto SIEMPRE se muestra.
-// ============================================================
+
 document.addEventListener("DOMContentLoaded", () => {
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // ---- Respaldo de seguridad: si por lo que sea el reveal no corre,
-  // el texto se muestra solo, nunca se queda invisible. ----
   function forceRevealAll() {
     document.querySelectorAll(".reveal").forEach(el => el.classList.add("in-view"));
   }
@@ -390,7 +361,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---- 2) Parallax de la imagen del hero ----
   function initHeroParallax() {
     const hero = document.querySelector(".hero");
-    if (!hero || reduceMotion) return;
+    const bgImg = document.querySelector(".hero-bg-img");
+    if (!hero || !bgImg || reduceMotion) return;
     if (window.matchMedia("(max-width: 900px)").matches) return;
 
     let ticking = false;
@@ -399,8 +371,8 @@ document.addEventListener("DOMContentLoaded", () => {
       ticking = true;
       requestAnimationFrame(() => {
         const offset = window.scrollY;
-        const shift = Math.min(offset * 0.15, 90);
-        hero.style.backgroundPosition = "center, center " + (32 + shift * 0.12) + "%";
+        const shift = Math.min(offset * 0.18, 60);
+        bgImg.style.transform = "translateY(" + shift + "px) scale(1.08)";
         ticking = false;
       });
     }, { passive: true });
