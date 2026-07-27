@@ -51,18 +51,14 @@ p { line-height: 1.7; color: var(--ink-soft); }
   max-width: 1200px; margin: 0 auto; padding: 16px 28px;
   display: flex; align-items: center; gap: 28px;
 }
-.nav-logo { display: flex; align-items: baseline; gap: 8px; margin-right: auto; }
+.nav-logo { display: flex; align-items: center; gap: 10px; margin-right: auto; }
 .nav-logo-mark {
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  border: 1.4px solid var(--rose-deep);
-  object-fit: cover;
-  object-position: center 38%;
-  background: #fff;
-  display: inline-block;
+  height: 44px; width: 44px;
+  object-fit: contain;
+  display: block;
   flex-shrink: 0;
 }
-.nav-logo-text { font-family: var(--script); font-size: 21px; color: var(--ink); }
+.nav-logo-text { font-family: var(--script); font-size: 21px; line-height: 1; color: var(--ink); }
 .nav-links { display: flex; gap: 26px; font-size: 14.5px; font-weight: 500; letter-spacing: .2px; }
 .nav-links a { opacity: .8; transition: opacity .2s, color .2s; }
 .nav-links a:hover { opacity: 1; color: var(--rose-deep); }
@@ -144,16 +140,11 @@ p { line-height: 1.7; color: var(--ink-soft); }
   display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
 .hero-monogram-img {
-  width: 128px; height: 128px;
-  border-radius: 50%;
-  border: 1.4px solid #fff;
-  object-fit: cover;
-  object-position: center 38%;
-  background: #fff;
-  box-shadow: 0 0 0 6px rgba(255,255,255,0.08), 0 10px 30px rgba(0,0,0,0.35);
+  height: 160px; width: auto;
+  object-fit: contain;
 }
 @media (max-width: 600px) {
-  .hero-monogram-img { width: 96px; height: 96px; }
+  .hero-monogram-img { height: 120px; }
 }
 .hero-monogram-word { font-family: var(--sans); font-size: 9px; letter-spacing: 3px; color: rgba(255,255,255,0.75); }
 
@@ -196,7 +187,11 @@ p { line-height: 1.7; color: var(--ink-soft); }
 .section--tint { background: linear-gradient(180deg, transparent, var(--blush-deep) 12%, var(--blush-deep) 88%, transparent); }
 .section-inner { max-width: 1180px; margin: 0 auto; }
 .section-inner--narrow { max-width: 720px; text-align: center; }
-.eyebrow { text-transform: uppercase; letter-spacing: 2.6px; font-size: 12px; font-weight: 700; color: var(--rose-deep); text-align: center; margin-bottom: 10px; }
+.eyebrow { text-transform: uppercase; letter-spacing: 2.6px; font-size: 15px; font-weight: 700; color: var(--rose-deep); text-align: center; margin-bottom: 10px; }
+.eyebrow--brand { font-size: 22px; letter-spacing: 4px; margin-bottom: 16px; }
+@media (max-width: 600px) {
+  .eyebrow--brand { font-size: 18px; letter-spacing: 3px; }
+}
 .section-title { font-size: clamp(28px, 4vw, 42px); text-align: center; margin-bottom: 26px; line-height: 1.2; }
 .lead { font-size: 16.5px; max-width: 620px; margin: 0 auto; }
 .lead--center { text-align: center; }
