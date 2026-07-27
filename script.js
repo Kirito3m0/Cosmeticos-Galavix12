@@ -1,20 +1,18 @@
-// Fotos y categorías de cada marca: se llenan con loadData() desde
-// Supabase (subidas por el admin desde el panel). Estructura por brand_id:
-// { general: [ {id,image_url}, ... ], categories: [ {id,name_es,name_en,images:[...]} ] }
+
 let BRAND_MEDIA_CACHE = {};
 
 function brandMedia(brand) {
   return BRAND_MEDIA_CACHE[brand.id] || { general: [], categories: [] };
 }
 
-// Todas las fotos de una marca en un solo arreglo (para la portada y el zoom)
+
 function brandAllImages(brand) {
   const media = brandMedia(brand);
   const catImgs = media.categories.flatMap(c => c.images);
   return [...media.general, ...catImgs];
 }
 
-// Datos por defecto: el sitio arranca con esto y los reemplaza si Supabase responde
+
 const DEFAULT_LOCATIONS = [
   { name: "Centro", address: "Amado Nervo #311-1, Col. Centro. Muy cerca de Milano.", hours_weekday: "10:00 am – 5:30 pm", hours_sunday: "10:00 am – 4:00 pm", closed_day: "Miércoles cerrado", maps_url: "https://www.google.com/maps/search/?api=1&query=31.7373677,-106.4848073", accent_color: "#C6435B", lat: 31.7373677, lng: -106.4848073 },
   { name: "Las Torres", address: "Av. de las Torres #1931. Lote Bravo. Plaza Arce, Local E11.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://www.google.com/maps/search/?api=1&query=31.6277153,-106.394144", accent_color: "#C97B4A", lat: 31.6277153, lng: -106.394144 },
@@ -33,7 +31,6 @@ const DEFAULT_BRANDS = [
   { slug: "nekane", name: "Nekane", facebook_album_url: null },
 ];
 
-// Sin datos por defecto: si no hay publicaciones en Supabase, se muestra el mensaje vacío
 const DEFAULT_POSTS = [];
 
 let LOCATIONS_CACHE = DEFAULT_LOCATIONS;
@@ -214,11 +211,9 @@ function renderNovedades() {
   `;
   }).join("");
 
-  // Le pedimos al SDK de Facebook que "dibuje" los posts embebidos recién insertados
   if (window.FB && window.FB.XFBML) {
     window.FB.XFBML.parse(wrap);
   } else {
-    // El SDK todavía no cargaba; en cuanto esté listo, dibuja los que ya insertamos
     window.fbAsyncInit = (function (prevInit) {
       return function () {
         FB.init({ xfbml: false, version: "v19.0" });
@@ -229,7 +224,6 @@ function renderNovedades() {
   }
 }
 
-// Secciones nuevas creadas desde el panel ("Secciones nuevas")
 function renderCustomSections() {
   const wrap = document.getElementById("customSectionsContainer");
   if (!wrap) return;
