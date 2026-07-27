@@ -1,3 +1,4 @@
+// Conteo de imágenes locales por marca (assets/marcas/<slug>/<slug>-01.jpg, etc.)
 const BRAND_IMAGE_COUNTS = {
   "italia-de-luxe": 39,
   "beauty-creations": 36,
@@ -21,7 +22,7 @@ function brandImages(slug) {
   return imgs;
 }
 
-
+// Datos por defecto: el sitio arranca con esto y los reemplaza si Supabase responde
 const DEFAULT_LOCATIONS = [
   { name: "Centro", address: "Amado Nervo #311-1, Col. Centro. Muy cerca de Milano.", hours_weekday: "10:00 am – 5:30 pm", hours_sunday: "10:00 am – 4:00 pm", closed_day: "Miércoles cerrado", maps_url: "https://maps.app.goo.gl/A9ncqzs5Heiyu2kn6", accent_color: "#C6435B", lat: 31.7373677, lng: -106.4848073 },
   { name: "Las Torres", address: "Av. de las Torres #1931. Lote Bravo. Plaza Arce, Local E11.", hours_weekday: "10:00 am – 6:00 pm", hours_sunday: "10:30 am – 4:00 pm", closed_day: null, maps_url: "https://www.google.com/maps/search/?api=1&query=31.6277,-106.3941", accent_color: "#C97B4A", lat: 31.6277, lng: -106.3941 },
@@ -38,14 +39,12 @@ const DEFAULT_BRANDS = [
   { slug: "bisss", name: "Bissú", facebook_album_url: null },
   { slug: "amandas", name: "Ananda", facebook_album_url: null },
   { slug: "nekane", name: "Nekane", facebook_album_url: null },
-
 ];
 
 let LOCATIONS_CACHE = DEFAULT_LOCATIONS;
 let BRANDS_CACHE = DEFAULT_BRANDS;
 
 async function loadData() {
-
   try {
     const { data: locations, error: locErr } = await supabaseClient
       .from("locations")
@@ -118,7 +117,7 @@ function renderBrands() {
   });
 }
 
-
+// Mapa real con las 4 sucursales (Leaflet + OpenStreetMap)
 let LEAFLET_MAP = null;
 function initMap() {
   const container = document.getElementById("locMap");
@@ -155,6 +154,7 @@ function initMap() {
   LEAFLET_MAP.fitBounds(group.getBounds().pad(0.25));
 }
 
+// Galería / lightbox
 function openGallery(slug) {
   const brand = BRANDS_CACHE.find(b => b.slug === slug);
   const imgs = brandImages(slug);
@@ -166,7 +166,6 @@ function openGallery(slug) {
   title.textContent = brand ? brand.name : slug;
   track.innerHTML = imgs.map(src => `<img src="${src}" loading="lazy" alt="${brand ? brand.name : slug}">`).join("");
 
-  // Al picarle a una foto de la galería, se agranda (zoom)
   const trackImgs = Array.from(track.querySelectorAll("img"));
   trackImgs.forEach((img, index) => {
     img.addEventListener("click", () => openZoom(imgs, index, brand ? brand.name : slug));
@@ -188,6 +187,7 @@ function closeGallery() {
   document.body.style.overflow = "";
 }
 
+// Zoom de imagen
 let ZOOM_IMAGES = [];
 let ZOOM_INDEX = 0;
 let ZOOM_ALT = "";
@@ -226,12 +226,12 @@ function closeZoom() {
   ZOOM_IMAGES = [];
 }
 
-
+// Nav móvil, scroll-to-top, inicialización
 document.addEventListener("DOMContentLoaded", () => {
   initLanguage();
   window.renderDynamicSections();
   initMap();
-  loadData(); // intenta mejorar con datos frescos de Supabase, sin bloquear nada
+  loadData();
 
   const burger = document.getElementById("navBurger");
   const mobileNav = document.getElementById("navMobile");
@@ -248,7 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.id === "galleryModal") closeGallery();
   });
 
-  // Controles del modal de zoom
   document.getElementById("zoomClose").addEventListener("click", closeZoom);
   document.getElementById("zoomNext").addEventListener("click", zoomNext);
   document.getElementById("zoomPrev").addEventListener("click", zoomPrev);
@@ -273,15 +272,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
+// Animaciones: partículas del hero, parallax y reveal al hacer scroll
 document.addEventListener("DOMContentLoaded", () => {
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   function forceRevealAll() {
     document.querySelectorAll(".reveal").forEach(el => el.classList.add("in-view"));
   }
   const safetyTimer = setTimeout(forceRevealAll, 2500);
 
-  // ---- 1) Partículas doradas en el hero ----
   function initHeroParticles() {
     const canvas = document.getElementById("heroParticles");
     const hero = document.querySelector(".hero");
@@ -358,7 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(tick);
   }
 
-  // ---- 2) Parallax de la imagen del hero ----
   function initHeroParallax() {
     const hero = document.querySelector(".hero");
     const bgImg = document.querySelector(".hero-bg-img");
@@ -378,7 +376,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { passive: true });
   }
 
-  // ---- 3) Scroll reveal ----
   function initScrollReveal() {
     const items = document.querySelectorAll(".reveal");
     if (!items.length) return;
@@ -400,7 +397,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     items.forEach((el) => observer.observe(el));
     clearTimeout(safetyTimer);
-    // por si algún elemento nunca cruza el observer (ya está fuera de rango, etc.)
     setTimeout(forceRevealAll, 2500);
   }
 
