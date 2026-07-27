@@ -46,6 +46,30 @@ function showDashboard() {
   loadBrands();
   loadPosts();
   loadTextos();
+  loadCustomSections();
+}
+
+// ---------------- SUBIDA DE FOTOS (Supabase Storage) ----------------
+async function uploadFilesToStorage(files, folder) {
+  const urls = [];
+  for (const file of files) {
+    const rawExt = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const ext = rawExt || "jpg";
+    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabaseClient.storage.from("galavix-media").upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+    if (error) throw error;
+    const { data } = supabaseClient.storage.from("galavix-media").getPublicUrl(path);
+    urls.push(data.publicUrl);
+  }
+  return urls;
+}
+
+function imgThumb(img, deleteAttr) {
+  const attr = deleteAttr || "data-delete-image";
+  return `<div class="dash-img-thumb"><img src="${img.image_url}" loading="lazy" alt=""><button type="button" class="dash-img-remove" ${attr}="${img.id}" title="Eliminar foto">✕</button></div>`;
 }
 
 // ---------------- TABS ----------------
@@ -134,9 +158,59 @@ newLocationForm.addEventListener("submit", async (e) => {
 
 // ---------------- MARCAS ----------------
 async function loadBrands() {
-  const { data } = await supabaseClient.from("brands").select("*").order("sort_order");
+  const [{ data: brands }, { data: images }, { data: categories }] = await Promise.all([
+    supabaseClient.from("brands").select("*").order("sort_order"),
+    supabaseClient.from("brand_images").select("*").order("sort_order"),
+    supabaseClient.from("brand_categories").select("*").order("sort_order"),
+  ]);
   const list = document.getElementById("brandList");
-  list.innerHTML = (data || []).map(brand => `
+  list.innerHTML = (brands || []).map(brand => renderBrandItem(brand, images || [], categories || [])).join("")
+    || `<p class="dash-hint">Todavía no has agregado ninguna marca.</p>`;
+
+  list.querySelectorAll("[data-save-brand]").forEach(btn => {
+    btn.addEventListener("click", () => saveBrand(btn.dataset.saveBrand, btn.closest(".dash-item")));
+  });
+  list.querySelectorAll("[data-delete-brand]").forEach(btn => {
+    btn.addEventListener("click", () => deleteBrand(btn.dataset.deleteBrand));
+  });
+  list.querySelectorAll("[data-delete-image]").forEach(btn => {
+    btn.addEventListener("click", () => deleteBrandImage(btn.dataset.deleteImage));
+  });
+  list.querySelectorAll("[data-upload-general]").forEach(input => {
+    input.addEventListener("change", (e) => handleBrandImageUpload(e, input.dataset.uploadGeneral, null));
+  });
+  list.querySelectorAll("[data-upload-category]").forEach(input => {
+    input.addEventListener("change", (e) => handleBrandImageUpload(e, input.dataset.brandId, input.dataset.uploadCategory));
+  });
+  list.querySelectorAll("[data-delete-category]").forEach(btn => {
+    btn.addEventListener("click", () => deleteBrandCategory(btn.dataset.deleteCategory));
+  });
+  list.querySelectorAll("[data-add-category-form]").forEach(form => {
+    form.addEventListener("submit", (e) => addBrandCategory(e, form.dataset.addCategoryForm));
+  });
+}
+
+function renderBrandItem(brand, allImages, allCategories) {
+  const generalImages = allImages.filter(img => img.brand_id === brand.id && !img.category_id);
+  const cats = allCategories.filter(cat => cat.brand_id === brand.id);
+
+  const catBlocks = cats.map(cat => {
+    const catImages = allImages.filter(img => img.category_id === cat.id);
+    return `
+      <div class="dash-category-block">
+        <div class="dash-category-head">
+          <h4>${escapeAttr(cat.name_es)}${cat.name_en ? ` / ${escapeAttr(cat.name_en)}` : ""}</h4>
+          <button type="button" class="dash-category-delete" data-delete-category="${cat.id}">Eliminar categoría</button>
+        </div>
+        <div class="dash-img-grid">${catImages.map(img => imgThumb(img)).join("")}</div>
+        <label class="dash-upload-label">+ Subir fotos a esta categoría
+          <input type="file" accept="image/*" multiple data-upload-category="${cat.id}" data-brand-id="${brand.id}">
+        </label>
+      </div>
+    `;
+  }).join("");
+
+  return `
     <div class="dash-item" data-id="${brand.id}">
       <h3>${brand.name}</h3>
       <div class="dash-field"><label>Nombre</label><input data-field="name" value="${escapeAttr(brand.name || "")}"></div>
@@ -145,15 +219,27 @@ async function loadBrands() {
         <button class="dash-save" data-save-brand="${brand.id}">Guardar cambios</button>
         <button type="button" class="dash-delete" data-delete-brand="${brand.id}">Eliminar</button>
       </div>
-    </div>
-  `).join("") || `<p class="dash-hint">Todavía no has agregado ninguna marca.</p>`;
 
-  list.querySelectorAll("[data-save-brand]").forEach(btn => {
-    btn.addEventListener("click", () => saveBrand(btn.dataset.saveBrand, btn.closest(".dash-item")));
-  });
-  list.querySelectorAll("[data-delete-brand]").forEach(btn => {
-    btn.addEventListener("click", () => deleteBrand(btn.dataset.deleteBrand));
-  });
+      <div class="dash-subsection">
+        <label>Fotos generales de la marca</label>
+        <div class="dash-img-grid">${generalImages.map(img => imgThumb(img)).join("")}</div>
+        <p class="dash-upload-hint">Puedes seleccionar varias fotos a la vez, directo desde tu celular.</p>
+        <label class="dash-upload-label">+ Subir fotos
+          <input type="file" accept="image/*" multiple data-upload-general="${brand.id}">
+        </label>
+      </div>
+
+      <div class="dash-subsection">
+        <label>Categorías dentro de esta marca (opcional)</label>
+        ${catBlocks || `<p class="dash-upload-hint">Todavía no hay categorías. Si no las necesitas, deja tus fotos en "Fotos generales" de arriba.</p>`}
+        <form class="dash-add-inline" data-add-category-form="${brand.id}">
+          <input placeholder="Nombre de la categoría (ej. Sombras)" data-new-cat-es required>
+          <input placeholder="Nombre en inglés (opcional)" data-new-cat-en>
+          <button type="submit">+ Agregar categoría</button>
+        </form>
+      </div>
+    </div>
+  `;
 }
 
 async function saveBrand(id, itemEl) {
@@ -164,9 +250,64 @@ async function saveBrand(id, itemEl) {
 }
 
 async function deleteBrand(id) {
-  if (!confirm("¿Eliminar esta marca? Ya no va a aparecer en la página.")) return;
+  if (!confirm("¿Eliminar esta marca? Ya no va a aparecer en la página, junto con sus fotos y categorías.")) return;
   const { error } = await supabaseClient.from("brands").delete().eq("id", id);
   showToast(error ? "Error al eliminar" : "Marca eliminada ✓");
+  loadBrands();
+}
+
+async function handleBrandImageUpload(e, brandId, categoryId) {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  e.target.disabled = true;
+  showToast("Subiendo fotos…");
+  try {
+    const urls = await uploadFilesToStorage(files, `marcas/${brandId}`);
+    const rows = urls.map((url, i) => ({
+      brand_id: brandId,
+      category_id: categoryId || null,
+      image_url: url,
+      sort_order: Date.now() + i,
+    }));
+    const { error } = await supabaseClient.from("brand_images").insert(rows);
+    if (error) throw error;
+    showToast("Fotos agregadas ✓");
+    loadBrands();
+  } catch (err) {
+    console.error(err);
+    showToast("Error al subir las fotos");
+  } finally {
+    e.target.disabled = false;
+  }
+}
+
+async function deleteBrandImage(id) {
+  if (!confirm("¿Eliminar esta foto?")) return;
+  const { error } = await supabaseClient.from("brand_images").delete().eq("id", id);
+  showToast(error ? "Error al eliminar" : "Foto eliminada ✓");
+  loadBrands();
+}
+
+async function addBrandCategory(e, brandId) {
+  e.preventDefault();
+  const form = e.target;
+  const nameEs = form.querySelector("[data-new-cat-es]").value.trim();
+  const nameEn = form.querySelector("[data-new-cat-en]").value.trim();
+  if (!nameEs) return;
+  const { error } = await supabaseClient.from("brand_categories").insert({
+    brand_id: brandId,
+    name_es: nameEs,
+    name_en: nameEn || null,
+    sort_order: Date.now(),
+  });
+  showToast(error ? "Error al agregar la categoría" : "Categoría agregada ✓");
+  if (!error) loadBrands();
+}
+
+async function deleteBrandCategory(id) {
+  if (!confirm("¿Eliminar esta categoría? Sus fotos se quedan en la marca, solo dejan de estar agrupadas.")) return;
+  const { error } = await supabaseClient.from("brand_categories").delete().eq("id", id);
+  showToast(error ? "Error al eliminar" : "Categoría eliminada ✓");
   loadBrands();
 }
 
@@ -406,6 +547,141 @@ document.getElementById("saveTextosBtn").addEventListener("click", async () => {
   } finally {
     btn.disabled = false;
     btn.textContent = "Guardar todos los textos";
+  }
+});
+
+// ---------------- SECCIONES NUEVAS (custom_sections) ----------------
+async function loadCustomSections() {
+  const [{ data: sections }, { data: images }] = await Promise.all([
+    supabaseClient.from("custom_sections").select("*").order("sort_order"),
+    supabaseClient.from("custom_section_images").select("*").order("sort_order"),
+  ]);
+  const list = document.getElementById("sectionList");
+  list.innerHTML = (sections || []).map(sec => renderSectionItem(sec, images || [])).join("")
+    || `<p class="dash-hint">Todavía no has agregado ninguna sección nueva.</p>`;
+
+  list.querySelectorAll("[data-save-section]").forEach(btn => {
+    btn.addEventListener("click", () => saveSection(btn.dataset.saveSection, btn.closest(".dash-item")));
+  });
+  list.querySelectorAll("[data-delete-section]").forEach(btn => {
+    btn.addEventListener("click", () => deleteSection(btn.dataset.deleteSection));
+  });
+  list.querySelectorAll("[data-delete-section-image]").forEach(btn => {
+    btn.addEventListener("click", () => deleteSectionImage(btn.dataset.deleteSectionImage));
+  });
+  list.querySelectorAll("[data-upload-section]").forEach(input => {
+    input.addEventListener("change", (e) => handleSectionImageUpload(e, input.dataset.uploadSection));
+  });
+}
+
+function renderSectionItem(sec, allImages) {
+  const imgs = allImages.filter(img => img.section_id === sec.id);
+  return `
+    <div class="dash-item" data-id="${sec.id}">
+      <h3>${escapeAttr(sec.title_es || "(Sin título)")}</h3>
+      <div class="dash-field"><label>Título (español)</label><input data-field="title_es" value="${escapeAttr(sec.title_es || "")}"></div>
+      <div class="dash-field"><label>Título (inglés)</label><input data-field="title_en" value="${escapeAttr(sec.title_en || "")}"></div>
+      <div class="dash-field"><label>Subtítulo (español)</label><input data-field="subtitle_es" value="${escapeAttr(sec.subtitle_es || "")}"></div>
+      <div class="dash-field"><label>Subtítulo (inglés)</label><input data-field="subtitle_en" value="${escapeAttr(sec.subtitle_en || "")}"></div>
+      <div class="dash-field"><label>Texto (español)</label><textarea data-field="text_es">${escapeAttr(sec.text_es || "")}</textarea></div>
+      <div class="dash-field"><label>Texto (inglés)</label><textarea data-field="text_en">${escapeAttr(sec.text_en || "")}</textarea></div>
+      <div class="dash-inline-row">
+        <div class="dash-field" style="margin-bottom:0"><label>Orden</label><input type="number" data-field="sort_order" value="${sec.sort_order ?? 999}"></div>
+        <label class="dash-checkbox"><input type="checkbox" data-field="is_active" ${sec.is_active ? "checked" : ""}> Visible en la página</label>
+      </div>
+
+      <div class="dash-subsection">
+        <label>Fotos de esta sección</label>
+        <div class="dash-img-grid">${imgs.map(img => imgThumb(img, "data-delete-section-image")).join("")}</div>
+        <label class="dash-upload-label">+ Subir fotos
+          <input type="file" accept="image/*" multiple data-upload-section="${sec.id}">
+        </label>
+      </div>
+
+      <div class="dash-post-actions">
+        <button class="dash-save" data-save-section="${sec.id}">Guardar cambios</button>
+        <button type="button" class="dash-delete" data-delete-section="${sec.id}">Eliminar sección</button>
+      </div>
+    </div>
+  `;
+}
+
+async function saveSection(id, itemEl) {
+  const fields = {};
+  itemEl.querySelectorAll("[data-field]").forEach(inp => {
+    const key = inp.dataset.field;
+    if (inp.type === "checkbox") fields[key] = inp.checked;
+    else if (key === "sort_order") fields[key] = parseInt(inp.value, 10) || 999;
+    else fields[key] = inp.value;
+  });
+  const { error } = await supabaseClient.from("custom_sections").update(fields).eq("id", id);
+  showToast(error ? "Error al guardar" : "Sección actualizada ✓");
+}
+
+async function deleteSection(id) {
+  if (!confirm("¿Eliminar esta sección? Ya no va a aparecer en la página.")) return;
+  const { error } = await supabaseClient.from("custom_sections").delete().eq("id", id);
+  showToast(error ? "Error al eliminar" : "Sección eliminada ✓");
+  loadCustomSections();
+}
+
+async function deleteSectionImage(id) {
+  if (!confirm("¿Eliminar esta foto?")) return;
+  const { error } = await supabaseClient.from("custom_section_images").delete().eq("id", id);
+  showToast(error ? "Error al eliminar" : "Foto eliminada ✓");
+  loadCustomSections();
+}
+
+async function handleSectionImageUpload(e, sectionId) {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  e.target.disabled = true;
+  showToast("Subiendo fotos…");
+  try {
+    const urls = await uploadFilesToStorage(files, `secciones/${sectionId}`);
+    const rows = urls.map((url, i) => ({ section_id: sectionId, image_url: url, sort_order: Date.now() + i }));
+    const { error } = await supabaseClient.from("custom_section_images").insert(rows);
+    if (error) throw error;
+    showToast("Fotos agregadas ✓");
+    loadCustomSections();
+  } catch (err) {
+    console.error(err);
+    showToast("Error al subir las fotos");
+  } finally {
+    e.target.disabled = false;
+  }
+}
+
+const newSectionForm = document.getElementById("newSectionForm");
+newSectionForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const submitBtn = document.getElementById("newSecSubmit");
+  const titleEs = document.getElementById("newSecTitleEs").value.trim();
+  if (!titleEs) return;
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Agregando…";
+  try {
+    const { error } = await supabaseClient.from("custom_sections").insert({
+      slug: slugify(titleEs) + "-" + Date.now().toString(36),
+      title_es: titleEs,
+      title_en: document.getElementById("newSecTitleEn").value || null,
+      subtitle_es: document.getElementById("newSecSubEs").value || null,
+      subtitle_en: document.getElementById("newSecSubEn").value || null,
+      text_es: document.getElementById("newSecTextEs").value || null,
+      text_en: document.getElementById("newSecTextEn").value || null,
+      sort_order: parseInt(document.getElementById("newSecOrder").value, 10) || 999,
+    });
+    if (error) throw error;
+    showToast("Sección agregada ✓");
+    newSectionForm.reset();
+    loadCustomSections();
+  } catch (err) {
+    console.error(err);
+    showToast("Error al agregar la sección");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Agregar sección";
   }
 });
 

@@ -365,6 +365,11 @@ p { line-height: 1.7; color: var(--ink-soft); }
 .gallery-fb-link { font-size: 13px; font-weight: 600; color: var(--rose-deep); }
 .gallery-close { border: none; background: rgba(43,35,32,0.08); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; }
 .gallery-track { overflow-y: auto; padding: 22px 26px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.gallery-cat-title { grid-column: 1 / -1; font-family: var(--serif); font-size: 20px; color: var(--rose-deep); margin: 18px 0 2px; font-weight: 600; }
+.gallery-cat-title:first-child { margin-top: 0; }
+
+.custom-section-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-top: 40px; }
+.custom-section-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); cursor: pointer; display: block; box-shadow: 0 10px 26px rgba(168,92,60,0.14); }
 .gallery-track img { width: 100%; border-radius: 10px; display: block; aspect-ratio: 1; object-fit: cover; }
 
 /* ---------------- ZOOM DE IMAGEN (nuevo) ---------------- */
@@ -548,6 +553,7 @@ p { line-height: 1.7; color: var(--ink-soft); }
   .gallery-modal-head { padding: 14px 16px; }
   .gallery-modal-head h3 { font-size: 18px; }
   .gallery-track { padding: 14px 16px; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .custom-section-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 28px; }
 
   .footer { padding: 36px 18px; }
   .footer-logo { font-size: 20px; }

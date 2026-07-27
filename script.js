@@ -1,25 +1,17 @@
-// Conteo de imágenes locales por marca (assets/marcas/<slug>/<slug>-01.jpg, etc.)
-const BRAND_IMAGE_COUNTS = {
-  "italia-de-luxe": 39,
-  "beauty-creations": 36,
-  "pink-up": 49,
-  "amor-us": 33,
-  "by-apple": 20,
-  "bisss": 17,
-  "amandas": 36,
-  "nekane": 8,
-  "kj-beauty": 22,
-  "diamond-beauty": 8,
-};
+// Fotos y categorías de cada marca: se llenan con loadData() desde
+// Supabase (subidas por el admin desde el panel). Estructura por brand_id:
+// { general: [ {id,image_url}, ... ], categories: [ {id,name_es,name_en,images:[...]} ] }
+let BRAND_MEDIA_CACHE = {};
 
-function brandImages(slug) {
-  const count = BRAND_IMAGE_COUNTS[slug] || 0;
-  const imgs = [];
-  for (let i = 1; i <= count; i++) {
-    const num = String(i).padStart(2, "0");
-    imgs.push(`assets/marcas/${slug}/${slug}-${num}.jpg`);
-  }
-  return imgs;
+function brandMedia(brand) {
+  return BRAND_MEDIA_CACHE[brand.id] || { general: [], categories: [] };
+}
+
+// Todas las fotos de una marca en un solo arreglo (para la portada y el zoom)
+function brandAllImages(brand) {
+  const media = brandMedia(brand);
+  const catImgs = media.categories.flatMap(c => c.images);
+  return [...media.general, ...catImgs];
 }
 
 // Datos por defecto: el sitio arranca con esto y los reemplaza si Supabase responde
@@ -47,6 +39,26 @@ const DEFAULT_POSTS = [];
 let LOCATIONS_CACHE = DEFAULT_LOCATIONS;
 let BRANDS_CACHE = DEFAULT_BRANDS;
 let POSTS_CACHE = DEFAULT_POSTS;
+let CUSTOM_SECTIONS_CACHE = [];
+
+function buildBrandMediaCache(images, categories) {
+  const cache = {};
+  categories.forEach(cat => {
+    if (!cache[cat.brand_id]) cache[cat.brand_id] = { general: [], categories: [] };
+    cache[cat.brand_id].categories.push({ ...cat, images: [] });
+  });
+  images.forEach(img => {
+    if (!cache[img.brand_id]) cache[img.brand_id] = { general: [], categories: [] };
+    if (img.category_id) {
+      const cat = cache[img.brand_id].categories.find(c => c.id === img.category_id);
+      if (cat) cat.images.push(img);
+      else cache[img.brand_id].general.push(img); // categoría borrada: cae en general
+    } else {
+      cache[img.brand_id].general.push(img);
+    }
+  });
+  return cache;
+}
 
 async function loadData() {
   try {
@@ -74,12 +86,36 @@ async function loadData() {
       .order("sort_order");
     if (!brandErr && brands && brands.length) BRANDS_CACHE = brands;
 
+    const { data: brandImagesData } = await supabaseClient
+      .from("brand_images")
+      .select("*")
+      .order("sort_order");
+    const { data: brandCategoriesData } = await supabaseClient
+      .from("brand_categories")
+      .select("*")
+      .order("sort_order");
+    BRAND_MEDIA_CACHE = buildBrandMediaCache(brandImagesData || [], brandCategoriesData || []);
+
     const { data: posts, error: postErr } = await supabaseClient
       .from("posts")
       .select("*")
       .eq("is_active", true)
       .order("created_at", { ascending: false });
     if (!postErr) POSTS_CACHE = posts || [];
+
+    const { data: customSectionsData } = await supabaseClient
+      .from("custom_sections")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order");
+    const { data: customSectionImagesData } = await supabaseClient
+      .from("custom_section_images")
+      .select("*")
+      .order("sort_order");
+    CUSTOM_SECTIONS_CACHE = (customSectionsData || []).map(sec => ({
+      ...sec,
+      images: (customSectionImagesData || []).filter(img => img.section_id === sec.id),
+    }));
 
     window.renderDynamicSections();
     initMap();
@@ -92,6 +128,7 @@ window.renderDynamicSections = function () {
   renderLocations();
   renderBrands();
   renderNovedades();
+  renderCustomSections();
 };
 
 function renderLocations() {
@@ -122,8 +159,8 @@ function renderBrands() {
   if (!grid) return;
   const t = translations[window.currentLang || "es"];
   grid.innerHTML = BRANDS_CACHE.map(brand => {
-    const imgs = brandImages(brand.slug);
-    const cover = imgs[0] || "";
+    const imgs = brandAllImages(brand);
+    const cover = imgs[0] ? imgs[0].image_url : "";
     return `
     <article class="brand-card" data-slug="${brand.slug}">
       <div class="brand-cover" style="background-image:url('${cover}')"></div>
@@ -192,6 +229,45 @@ function renderNovedades() {
   }
 }
 
+// Secciones nuevas creadas desde el panel ("Secciones nuevas")
+function renderCustomSections() {
+  const wrap = document.getElementById("customSectionsContainer");
+  if (!wrap) return;
+  const lang = window.currentLang || "es";
+
+  if (!CUSTOM_SECTIONS_CACHE.length) {
+    wrap.innerHTML = "";
+    return;
+  }
+
+  wrap.innerHTML = CUSTOM_SECTIONS_CACHE.map(sec => {
+    const title = (lang === "en" && sec.title_en) ? sec.title_en : sec.title_es;
+    const subtitle = (lang === "en" && sec.subtitle_en) ? sec.subtitle_en : sec.subtitle_es;
+    const text = (lang === "en" && sec.text_en) ? sec.text_en : sec.text_es;
+    const hasImgs = (sec.images || []).length > 0;
+    return `
+      <section class="section custom-section" data-custom-section="${sec.id}">
+        <div class="section-inner">
+          ${subtitle ? `<p class="eyebrow">${subtitle}</p>` : ""}
+          ${title ? `<h2 class="section-title">${title}</h2>` : ""}
+          ${text ? `<p class="lead lead--center">${text}</p>` : ""}
+          ${hasImgs ? `<div class="custom-section-grid" data-custom-grid="${sec.id}"></div>` : ""}
+        </div>
+      </section>
+    `;
+  }).join("");
+
+  CUSTOM_SECTIONS_CACHE.forEach(sec => {
+    const grid = wrap.querySelector(`[data-custom-grid="${sec.id}"]`);
+    if (!grid) return;
+    const urls = (sec.images || []).map(img => img.image_url);
+    grid.innerHTML = urls.map(url => `<img src="${url}" loading="lazy" alt="${sec.title_es || ""}">`).join("");
+    Array.from(grid.querySelectorAll("img")).forEach((imgEl, index) => {
+      imgEl.addEventListener("click", () => openZoom(urls, index, sec.title_es || ""));
+    });
+  });
+}
+
 // Mapa real con las 4 sucursales (Leaflet + OpenStreetMap)
 let LEAFLET_MAP = null;
 function initMap() {
@@ -232,18 +308,37 @@ function initMap() {
 // Galería / lightbox
 function openGallery(slug) {
   const brand = BRANDS_CACHE.find(b => b.slug === slug);
-  const imgs = brandImages(slug);
   const modal = document.getElementById("galleryModal");
   const track = document.getElementById("galleryTrack");
   const title = document.getElementById("galleryTitle");
   const fbLink = document.getElementById("galleryFbLink");
+  const brandName = brand ? brand.name : slug;
 
-  title.textContent = brand ? brand.name : slug;
-  track.innerHTML = imgs.map(src => `<img src="${src}" loading="lazy" alt="${brand ? brand.name : slug}">`).join("");
+  title.textContent = brandName;
+
+  const media = brand ? brandMedia(brand) : { general: [], categories: [] };
+  const allUrls = brandAllImages(brand || {}).map(img => img.image_url);
+
+  let html = "";
+  if (media.general.length) {
+    html += media.general.map(img => `<img src="${img.image_url}" loading="lazy" alt="${brandName}">`).join("");
+  }
+  media.categories.forEach(cat => {
+    if (!cat.images.length) return;
+    const lang = window.currentLang || "es";
+    const catName = (lang === "en" && cat.name_en) ? cat.name_en : cat.name_es;
+    html += `<div class="gallery-cat-title">${catName}</div>`;
+    html += cat.images.map(img => `<img src="${img.image_url}" loading="lazy" alt="${brandName} — ${catName}">`).join("");
+  });
+  if (!allUrls.length) {
+    html = `<p class="loading-hint">Todavía no hay fotos de esta marca.</p>`;
+  }
+  track.innerHTML = html;
 
   const trackImgs = Array.from(track.querySelectorAll("img"));
   trackImgs.forEach((img, index) => {
-    img.addEventListener("click", () => openZoom(imgs, index, brand ? brand.name : slug));
+    const zoomIndex = allUrls.indexOf(img.getAttribute("src"));
+    img.addEventListener("click", () => openZoom(allUrls, zoomIndex >= 0 ? zoomIndex : index, brandName));
   });
 
   if (brand && brand.facebook_album_url) {

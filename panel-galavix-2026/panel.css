@@ -70,6 +70,45 @@ h1 { font-family: "Cormorant Garamond", serif; }
   border-radius: 100px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 13.5px;
 }
 
+.dash-subsection { border-top: 1px dashed rgba(43,35,32,0.15); margin-top: 16px; padding-top: 14px; }
+.dash-subsection > label, .dash-subsection-title {
+  display: block; font-size: 12.5px; font-weight: 700; color: var(--rose-deep);
+  text-transform: uppercase; letter-spacing: .4px; margin-bottom: 10px;
+}
+
+.dash-img-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.dash-img-thumb { position: relative; width: 74px; height: 74px; border-radius: 8px; overflow: hidden; background: #f2f2f2; }
+.dash-img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dash-img-remove {
+  position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: #fff; border: none; font-size: 11px; cursor: pointer;
+  line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.dash-upload-label {
+  display: inline-block; padding: 8px 16px; border-radius: 100px; border: 1.5px dashed var(--rose);
+  color: var(--rose-deep); font-size: 12.5px; font-weight: 600; cursor: pointer; margin-bottom: 6px;
+}
+.dash-upload-label input[type="file"] { display: none; }
+.dash-upload-hint { font-size: 11.5px; color: var(--ink-soft); margin: 0 0 4px; }
+
+.dash-category-block { background: var(--blush); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.dash-category-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.dash-category-head h4 { margin: 0; font-size: 14.5px; }
+.dash-category-delete { background: none; border: none; color: #c0392b; font-size: 12px; cursor: pointer; font-family: inherit; }
+
+.dash-add-inline { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.dash-add-inline input {
+  flex: 1; min-width: 140px; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(43,35,32,0.15);
+  font-family: inherit; font-size: 13px;
+}
+.dash-add-inline button {
+  background: var(--rose-deep); color: #fff; border: none; padding: 8px 16px; border-radius: 100px;
+  font-weight: 600; cursor: pointer; font-family: inherit; font-size: 12.5px; white-space: nowrap;
+}
+
+.dash-inline-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.dash-inline-row input[type="number"] { width: 90px; }
+
 .dash-toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 100px; font-size: 14px;

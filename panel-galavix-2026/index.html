@@ -36,6 +36,7 @@
     <button class="dash-tab" data-tab="marcas">Marcas</button>
     <button class="dash-tab" data-tab="novedades">Recién llegado</button>
     <button class="dash-tab" data-tab="textos">Textos de la página</button>
+    <button class="dash-tab" data-tab="secciones">Secciones nuevas</button>
   </nav>
 
   <section class="dash-panel dash-panel--active" id="panel-sucursales">
@@ -56,7 +57,7 @@
   </section>
 
   <section class="dash-panel" id="panel-marcas">
-    <p class="dash-hint">Edita el nombre y el enlace del álbum de Facebook de cada marca, agrega una nueva o elimina la que ya no manejes.</p>
+    <p class="dash-hint">Edita el nombre y el enlace del álbum de Facebook de cada marca, agrega una nueva o elimina la que ya no manejes. Debajo de cada marca puedes subir fotos directo desde tu celular o computadora (sin GitHub) y organizarlas en categorías (ej. "Sombras", "Labiales").</p>
 
     <form class="dash-item dash-add-form" id="newBrandForm">
       <h3>Agregar marca nueva</h3>
@@ -86,6 +87,24 @@
     <p class="dash-hint">Edita los textos principales de la página, en español e inglés. Dale "Guardar todos los textos" al final para publicar los cambios.</p>
     <div id="textosList" class="dash-list"></div>
     <button type="button" class="dash-save dash-save--wide" id="saveTextosBtn">Guardar todos los textos</button>
+  </section>
+
+  <section class="dash-panel" id="panel-secciones">
+    <p class="dash-hint">Crea secciones completamente nuevas para la página principal (además de Nosotros, Precios, Sucursales, Marcas, etc.). Cada una puede tener título, texto y sus propias fotos. Usa "Orden" para decidir en qué posición aparece (entre más chico el número, más arriba sale) y la casilla "Visible" para publicarla o esconderla sin borrarla.</p>
+
+    <form class="dash-item dash-add-form" id="newSectionForm">
+      <h3>Agregar sección nueva</h3>
+      <div class="dash-field"><label>Título (español)</label><input id="newSecTitleEs" placeholder="Ej. Promociones del mes" required></div>
+      <div class="dash-field"><label>Título (inglés, opcional)</label><input id="newSecTitleEn"></div>
+      <div class="dash-field"><label>Subtítulo (español, opcional)</label><input id="newSecSubEs"></div>
+      <div class="dash-field"><label>Subtítulo (inglés, opcional)</label><input id="newSecSubEn"></div>
+      <div class="dash-field"><label>Texto (español)</label><textarea id="newSecTextEs"></textarea></div>
+      <div class="dash-field"><label>Texto (inglés, opcional)</label><textarea id="newSecTextEn"></textarea></div>
+      <div class="dash-field"><label>Orden (número, opcional)</label><input type="number" id="newSecOrder" placeholder="999"></div>
+      <button type="submit" class="dash-save" id="newSecSubmit">Agregar sección</button>
+    </form>
+
+    <div id="sectionList" class="dash-list"></div>
   </section>
 
   <p class="dash-toast" id="toast"></p>
