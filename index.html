@@ -25,6 +25,7 @@
       <a href="#nosotros" data-i18n="nav_nosotros">Nosotros</a>
       <a href="#precios" data-i18n="nav_precios">Precios</a>
       <a href="#sucursales" data-i18n="nav_sucursales">Sucursales</a>
+      <a href="#novedades" data-i18n="nav_novedades">Novedades</a>
       <a href="#marcas" data-i18n="nav_marcas">Marcas</a>
       <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
     </nav>
@@ -41,6 +42,7 @@
     <a href="#nosotros" data-i18n="nav_nosotros">Nosotros</a>
     <a href="#precios" data-i18n="nav_precios">Precios</a>
     <a href="#sucursales" data-i18n="nav_sucursales">Sucursales</a>
+    <a href="#novedades" data-i18n="nav_novedades">Novedades</a>
     <a href="#marcas" data-i18n="nav_marcas">Marcas</a>
     <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
     <div class="lang-switch lang-switch--mobile">
@@ -153,6 +155,17 @@
   </div>
 </section>
 
+<section class="section" id="novedades">
+  <div class="section-inner">
+    <p class="eyebrow reveal" data-i18n="novedades_eyebrow">Recién llegado</p>
+    <h2 class="section-title reveal"><span data-i18n="novedades_title_1">Lo más nuevo,</span> <em data-i18n="novedades_title_2">recién llegado</em></h2>
+    <p class="lead lead--center reveal" data-i18n="novedades_lead">—</p>
+    <div class="novedades-scroll" id="novedadesScroll">
+      <p class="loading-hint">Cargando novedades…</p>
+    </div>
+  </div>
+</section>
+
 <section class="section section--tint" id="marcas">
   <div class="section-inner">
     <p class="eyebrow reveal" data-i18n="marcas_eyebrow">Existencias por marca</p>
@@ -252,6 +265,14 @@
   <button id="zoomNext" class="zoom-nav zoom-nav--next" aria-label="Foto siguiente">›</button>
   <button id="zoomClose" class="zoom-close" aria-label="Cerrar">✕</button>
 </div>
+
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function () {
+    FB.init({ xfbml: false, version: 'v19.0' });
+  };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js"></script>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

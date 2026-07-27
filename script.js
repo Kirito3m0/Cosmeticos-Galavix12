@@ -41,11 +41,26 @@ const DEFAULT_BRANDS = [
   { slug: "nekane", name: "Nekane", facebook_album_url: null },
 ];
 
+// Sin datos por defecto: si no hay publicaciones en Supabase, se muestra el mensaje vacío
+const DEFAULT_POSTS = [];
+
 let LOCATIONS_CACHE = DEFAULT_LOCATIONS;
 let BRANDS_CACHE = DEFAULT_BRANDS;
+let POSTS_CACHE = DEFAULT_POSTS;
 
 async function loadData() {
   try {
+    const { data: content, error: contentErr } = await supabaseClient
+      .from("site_content")
+      .select("*");
+    if (!contentErr && content) {
+      content.forEach(row => {
+        if (row.content_es) translations.es[row.section_key] = row.content_es;
+        if (row.content_en) translations.en[row.section_key] = row.content_en;
+      });
+      if (window.currentLang) applyLanguage(window.currentLang);
+    }
+
     const { data: locations, error: locErr } = await supabaseClient
       .from("locations")
       .select("*")
@@ -59,6 +74,13 @@ async function loadData() {
       .order("sort_order");
     if (!brandErr && brands && brands.length) BRANDS_CACHE = brands;
 
+    const { data: posts, error: postErr } = await supabaseClient
+      .from("posts")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
+    if (!postErr) POSTS_CACHE = posts || [];
+
     window.renderDynamicSections();
     initMap();
   } catch (e) {
@@ -69,6 +91,7 @@ async function loadData() {
 window.renderDynamicSections = function () {
   renderLocations();
   renderBrands();
+  renderNovedades();
 };
 
 function renderLocations() {
@@ -115,6 +138,58 @@ function renderBrands() {
   grid.querySelectorAll("[data-open-gallery]").forEach(btn => {
     btn.addEventListener("click", () => openGallery(btn.dataset.openGallery));
   });
+}
+
+// "Recién llegado": franja con las últimas publicaciones que sube el admin
+function timeAgoLabel(dateStr, t) {
+  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+  if (days <= 0) return t.novedades_hoy;
+  if (days === 1) return t.novedades_ayer;
+  return t.novedades_dias.replace("{n}", days);
+}
+
+function renderNovedades() {
+  const wrap = document.getElementById("novedadesScroll");
+  if (!wrap) return;
+  const t = translations[window.currentLang || "es"];
+  const lang = window.currentLang || "es";
+
+  if (!POSTS_CACHE.length) {
+    wrap.innerHTML = `<p class="novedades-empty">${t.novedades_vacio}</p>`;
+    return;
+  }
+
+  wrap.innerHTML = POSTS_CACHE.filter(post => post.fb_url).map((post, index) => {
+    const note = (lang === "en" ? post.note_en : post.note_es) || post.note_es || post.note_en || "";
+    const showBadge = index < 3; // las 3 más recientes se marcan como "Nuevo"
+    return `
+    <article class="novedades-card">
+      ${showBadge ? `<span class="novedades-badge">${t.novedades_nuevo}</span>` : ""}
+      <div class="novedades-embed">
+        <div class="fb-post" data-href="${post.fb_url}" data-width="500" data-show-text="true"></div>
+      </div>
+      <div class="novedades-body">
+        ${note ? `<p class="novedades-caption">${note}</p>` : ""}
+        <p class="novedades-time">${timeAgoLabel(post.created_at, t)}</p>
+        <a class="novedades-link" href="${post.fb_url}" target="_blank" rel="noopener">${t.novedades_ver}</a>
+      </div>
+    </article>
+  `;
+  }).join("");
+
+  // Le pedimos al SDK de Facebook que "dibuje" los posts embebidos recién insertados
+  if (window.FB && window.FB.XFBML) {
+    window.FB.XFBML.parse(wrap);
+  } else {
+    // El SDK todavía no cargaba; en cuanto esté listo, dibuja los que ya insertamos
+    window.fbAsyncInit = (function (prevInit) {
+      return function () {
+        FB.init({ xfbml: false, version: "v19.0" });
+        FB.XFBML.parse(wrap);
+        if (prevInit) prevInit();
+      };
+    })(window.fbAsyncInit);
+  }
 }
 
 // Mapa real con las 4 sucursales (Leaflet + OpenStreetMap)

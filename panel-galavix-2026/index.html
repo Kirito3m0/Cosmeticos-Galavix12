@@ -34,23 +34,74 @@
   <nav class="dash-tabs">
     <button class="dash-tab dash-tab--active" data-tab="sucursales">Sucursales</button>
     <button class="dash-tab" data-tab="marcas">Marcas</button>
+    <button class="dash-tab" data-tab="novedades">Recién llegado</button>
+    <button class="dash-tab" data-tab="textos">Textos de la página</button>
   </nav>
 
   <section class="dash-panel dash-panel--active" id="panel-sucursales">
-    <p class="dash-hint">Edita dirección, horarios y el enlace de mapa de cada sucursal. Los cambios se guardan al instante y se ven en la página pública en cuanto recargue.</p>
+    <p class="dash-hint">Edita dirección, horarios y el enlace de mapa de cada sucursal, agrega una nueva o elimina una que ya no exista. Los cambios se ven en la página pública en cuanto recargue.</p>
+
+    <form class="dash-item dash-add-form" id="newLocationForm">
+      <h3>Agregar sucursal nueva</h3>
+      <div class="dash-field"><label>Nombre</label><input id="newLocName" placeholder="Ej. Zaragoza" required></div>
+      <div class="dash-field"><label>Dirección</label><input id="newLocAddress" placeholder="Calle, colonia, referencia" required></div>
+      <div class="dash-field"><label>Horario Lun–Sáb</label><input id="newLocHoursWeekday" placeholder="10:00 am – 6:00 pm"></div>
+      <div class="dash-field"><label>Horario Domingo</label><input id="newLocHoursSunday" placeholder="10:30 am – 4:00 pm"></div>
+      <div class="dash-field"><label>Día cerrado (opcional)</label><input id="newLocClosedDay" placeholder="Ej. Miércoles cerrado"></div>
+      <div class="dash-field"><label>Link de Google Maps</label><input id="newLocMapsUrl" placeholder="https://maps.app.goo.gl/..."></div>
+      <button type="submit" class="dash-save" id="newLocSubmit">Agregar sucursal</button>
+    </form>
+
     <div id="locList" class="dash-list"></div>
   </section>
 
   <section class="dash-panel" id="panel-marcas">
-    <p class="dash-hint">Edita el nombre y el enlace del álbum de Facebook de cada marca.</p>
+    <p class="dash-hint">Edita el nombre y el enlace del álbum de Facebook de cada marca, agrega una nueva o elimina la que ya no manejes.</p>
+
+    <form class="dash-item dash-add-form" id="newBrandForm">
+      <h3>Agregar marca nueva</h3>
+      <div class="dash-field"><label>Nombre</label><input id="newBrandName" placeholder="Ej. Nueva Marca" required></div>
+      <div class="dash-field"><label>Enlace del álbum de Facebook (opcional)</label><input id="newBrandFbUrl" placeholder="https://www.facebook.com/media/set/..."></div>
+      <button type="submit" class="dash-save" id="newBrandSubmit">Agregar marca</button>
+    </form>
+
     <div id="brandList" class="dash-list"></div>
+  </section>
+
+  <section class="dash-panel" id="panel-novedades">
+    <p class="dash-hint">Pega el link de la publicación de Facebook y aparece de inmediato en la sección "Recién llegado" de la página, mostrando la publicación real (foto, texto, todo). Se muestran de la más nueva a la más vieja.</p>
+
+    <form class="dash-item dash-add-form" id="newPostForm">
+      <h3>Agregar publicación nueva</h3>
+      <div class="dash-field"><label>Link de la publicación de Facebook</label><input type="url" id="newPostFbUrl" placeholder="https://www.facebook.com/..." required></div>
+      <div class="dash-field"><label>Nota opcional (español)</label><input id="newPostNoteEs" placeholder="Ej. Nueva paleta de sombras Italia de Luxe"></div>
+      <div class="dash-field"><label>Nota opcional (inglés)</label><input id="newPostNoteEn"></div>
+      <button type="submit" class="dash-save" id="newPostSubmit">Publicar</button>
+    </form>
+
+    <div id="postList" class="dash-list"></div>
+  </section>
+
+  <section class="dash-panel" id="panel-textos">
+    <p class="dash-hint">Edita los textos principales de la página, en español e inglés. Dale "Guardar todos los textos" al final para publicar los cambios.</p>
+    <div id="textosList" class="dash-list"></div>
+    <button type="button" class="dash-save dash-save--wide" id="saveTextosBtn">Guardar todos los textos</button>
   </section>
 
   <p class="dash-toast" id="toast"></p>
 </div>
 
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function () {
+    FB.init({ xfbml: false, version: 'v19.0' });
+  };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../config.js"></script>
+<script src="../i18n.js"></script>
 <script src="panel.js"></script>
 </body>
 </html>
