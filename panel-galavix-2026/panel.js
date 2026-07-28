@@ -350,9 +350,14 @@ newBrandForm.addEventListener("submit", async (e) => {
 async function loadPosts() {
   const { data } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false });
   const list = document.getElementById("postList");
-  list.innerHTML = (data || []).map(post => `
+  list.innerHTML = (data || []).map(post => {
+    const embedSrc = facebookEmbedSrc(post.fb_url || "");
+    const preview = embedSrc
+      ? `<iframe src="${escapeAttr(embedSrc)}" width="320" height="420" style="border:none;overflow:hidden;max-width:100%" scrolling="no" frameborder="0" allowfullscreen="true" loading="lazy"></iframe>`
+      : `<p class="dash-hint">⚠️ Este link no trae la publicación específica — corrígelo abajo y dale "Guardar cambios".</p>`;
+    return `
     <div class="dash-item" data-id="${post.id}">
-      <div class="dash-post-preview"><div class="fb-post" data-href="${escapeAttr(post.fb_url || "")}" data-width="320" data-show-text="true"></div></div>
+      <div class="dash-post-preview">${preview}</div>
       <div class="dash-field"><label>Link de la publicación de Facebook</label><input data-field="fb_url" value="${escapeAttr(post.fb_url || "")}"></div>
       <div class="dash-field"><label>Nota (español)</label><input data-field="note_es" value="${escapeAttr(post.note_es || "")}"></div>
       <div class="dash-field"><label>Nota (inglés)</label><input data-field="note_en" value="${escapeAttr(post.note_en || "")}"></div>
@@ -362,7 +367,8 @@ async function loadPosts() {
         <button type="button" class="dash-delete" data-delete-post="${post.id}">Eliminar</button>
       </div>
     </div>
-  `).join("") || `<p class="dash-hint">Todavía no has agregado ninguna publicación.</p>`;
+  `;
+  }).join("") || `<p class="dash-hint">Todavía no has agregado ninguna publicación.</p>`;
 
   list.querySelectorAll("[data-save-post]").forEach(btn => {
     btn.addEventListener("click", () => savePost(btn.dataset.savePost, btn.closest(".dash-item")));
@@ -370,8 +376,6 @@ async function loadPosts() {
   list.querySelectorAll("[data-delete-post]").forEach(btn => {
     btn.addEventListener("click", () => deletePost(btn.dataset.deletePost));
   });
-
-  if (window.FB && window.FB.XFBML) FB.XFBML.parse(list);
 }
 
 async function savePost(id, itemEl) {
@@ -379,6 +383,17 @@ async function savePost(id, itemEl) {
   itemEl.querySelectorAll("[data-field]").forEach(inp => {
     fields[inp.dataset.field] = inp.type === "checkbox" ? inp.checked : inp.value;
   });
+  // Pase lo que pase pegue el admin (link corto, código de "Insertar", el
+  // link del plugin, con símbolos %3A%2F o sin ellos), lo guardamos ya
+  // listo para funcionar directo en el iframe.
+  if (typeof fields.fb_url === "string" && fields.fb_url.trim()) {
+    const clean = facebookEmbedSrc(fields.fb_url);
+    if (!clean) {
+      showToast("Ese link no trae la publicación específica (parece el link genérico del plugin). Pega el link de la publicación o el código de \"Insertar\".");
+      return;
+    }
+    fields.fb_url = clean;
+  }
   const { error } = await supabaseClient.from("posts").update(fields).eq("id", id);
   showToast(error ? "Error al guardar" : "Publicación actualizada ✓");
   if (!error) loadPosts();
@@ -395,8 +410,13 @@ const newPostForm = document.getElementById("newPostForm");
 newPostForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const submitBtn = document.getElementById("newPostSubmit");
-  const fbUrl = document.getElementById("newPostFbUrl").value.trim();
-  if (!fbUrl) return;
+  const fbUrlRaw = document.getElementById("newPostFbUrl").value.trim();
+  if (!fbUrlRaw) return;
+  const fbUrl = facebookEmbedSrc(fbUrlRaw);
+  if (!fbUrl) {
+    showToast("Ese link no trae la publicación específica (parece el link genérico del plugin). Pega el link de la publicación o el código de \"Insertar\".");
+    return;
+  }
 
   submitBtn.disabled = true;
   submitBtn.textContent = "Publicando…";

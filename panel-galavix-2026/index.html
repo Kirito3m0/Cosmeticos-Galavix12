@@ -74,7 +74,7 @@
 
     <form class="dash-item dash-add-form" id="newPostForm">
       <h3>Agregar publicación nueva</h3>
-      <div class="dash-field"><label>Link de la publicación de Facebook</label><input type="url" id="newPostFbUrl" placeholder="https://www.facebook.com/..." required></div>
+      <div class="dash-field"><label>Link de la publicación de Facebook</label><input type="text" id="newPostFbUrl" placeholder="Pega aquí el link o el código de Insertar" required></div>
       <div class="dash-field"><label>Nota opcional (español)</label><input id="newPostNoteEs" placeholder="Ej. Nueva paleta de sombras Italia de Luxe"></div>
       <div class="dash-field"><label>Nota opcional (inglés)</label><input id="newPostNoteEn"></div>
       <button type="submit" class="dash-save" id="newPostSubmit">Publicar</button>
@@ -109,14 +109,6 @@
 
   <p class="dash-toast" id="toast"></p>
 </div>
-
-<div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function () {
-    FB.init({ xfbml: false, version: 'v19.0' });
-  };
-</script>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../config.js"></script>

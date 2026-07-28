@@ -196,32 +196,22 @@ function renderNovedades() {
   wrap.innerHTML = POSTS_CACHE.filter(post => post.fb_url).map((post, index) => {
     const note = (lang === "en" ? post.note_en : post.note_es) || post.note_es || post.note_en || "";
     const showBadge = index < 3; // las 3 más recientes se marcan como "Nuevo"
+    const embedSrc = facebookEmbedSrc(post.fb_url);
+    const viewLink = facebookViewLink(post.fb_url);
     return `
     <article class="novedades-card">
       ${showBadge ? `<span class="novedades-badge">${t.novedades_nuevo}</span>` : ""}
       <div class="novedades-embed">
-        <div class="fb-post" data-href="${post.fb_url}" data-width="500" data-show-text="true"></div>
+        <iframe src="${embedSrc}" width="500" height="600" style="border:none;overflow:hidden;max-width:100%" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" loading="lazy"></iframe>
       </div>
       <div class="novedades-body">
         ${note ? `<p class="novedades-caption">${note}</p>` : ""}
         <p class="novedades-time">${timeAgoLabel(post.created_at, t)}</p>
-        <a class="novedades-link" href="${post.fb_url}" target="_blank" rel="noopener">${t.novedades_ver}</a>
+        <a class="novedades-link" href="${viewLink}" target="_blank" rel="noopener">${t.novedades_ver}</a>
       </div>
     </article>
   `;
   }).join("");
-
-  if (window.FB && window.FB.XFBML) {
-    window.FB.XFBML.parse(wrap);
-  } else {
-    window.fbAsyncInit = (function (prevInit) {
-      return function () {
-        FB.init({ xfbml: false, version: "v19.0" });
-        FB.XFBML.parse(wrap);
-        if (prevInit) prevInit();
-      };
-    })(window.fbAsyncInit);
-  }
 }
 
 function renderCustomSections() {
